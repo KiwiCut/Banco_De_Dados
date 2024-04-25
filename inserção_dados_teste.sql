@@ -5,6 +5,6 @@ exec kiwicut.incluirCliente 'Maria', 'Carolnia','mariacarolina@gmail.com','82946
 
 
 
-
+select * from kiwicut.Cliente
 
 SELECT * FROM kiwicut.Cliente
