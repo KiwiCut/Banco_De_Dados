@@ -48,18 +48,20 @@ END
 
 
 -- atualizar: nome, sobrenome, cep, telefone,senha 
-CREATE or alter PROCEDURE kiwicut.atualizarCliente (
-    @nome varchar(11), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha varchar,
-    @cpf char(11), @cep char(9), @dataNascimento date
-)
+CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
+    @nome varchar(15), @cpf char(11)
 AS
-    BEGIN
-        IF 
-            BEGIN
-                h
-SELECT 
-from 
 BEGIN
+    if not EXISTS (select id from kiwicut.Cliente where cpf = @cpf)
+        Begin
+            DECLARE @Mensagem varchar(30)
+            set @Mensagem = 'CPF inexistente e/ou inválido'
+            RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
+        END
+    ELSE
+        BEGIN
+            update kiwicut.Cliente set nome = @nome where cpf = @cpf
+        END    
 END
 
 create or ALTER VIEW kiwicut.ingressosPorNomes as 
