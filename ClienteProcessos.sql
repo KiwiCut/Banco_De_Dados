@@ -47,7 +47,7 @@ BEGIN
 END
 
 
--- atualizar: cep, telefone,senha 
+--senha 
 CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
     @nome varchar(15), @cpf char(11)
 AS
@@ -89,6 +89,56 @@ BEGIN
     END    
 END
 
+
+CREATE or alter PROCEDURE kiwicut.atualizarTelefoneCliente 
+    @telefone char(11), @cpf char(11)
+AS
+BEGIN
+    if not EXISTS (select cpf from kiwicut.Cliente where cpf = @cpf)
+        Begin
+            DECLARE @Mensagem varchar(60)
+            set @Mensagem = 'Número de telefone atrelado ao CPF é inexistente e/ou inválido'
+            RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
+        END
+    ELSE
+    BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            update kiwicut.Cliente set telefone = @telefone where cpf = @cpf
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END    
+END
+
+CREATE or alter PROCEDURE kiwicut.atualizarCepCliente 
+    @cep char(9), @cpf char(11)
+AS
+BEGIN
+    if not EXISTS (select cpf from kiwicut.Cliente where cpf = @cpf)
+        Begin
+            DECLARE @Mensagem varchar(47)
+            set @Mensagem = 'CEP atrelado ao CPF é inexistente e/ou inválido'
+            RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
+        END
+    ELSE
+    BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            update kiwicut.Cliente set cep = @cep where cpf = @cpf
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END    
+END
 
 
 create or ALTER VIEW kiwicut.ingressosPorNomes as 
