@@ -19,36 +19,30 @@ BEGIN
         end
 END
 
-CREATE OR ALTER PROCEDURE kiwicut.deletarCliente
-    @cpf CHAR(11)
-AS
+CREATE or ALTER PROCEDURE kiwicut.deletarCliente
+    @cpf char(11)
+as 
 BEGIN
-    DECLARE @id int
-    IF NOT EXISTS (SELECT cpf FROM kiwicut.Cliente WHERE cpf = @cpf)
+    declare @id int, @Mensagem varchar(31)
+    SELECT @id = id FROM kiwicut.Cliente WHERE cpf = @cpf
+    IF NOT EXISTS (select * from kiwicut.Cliente where id = @id)
     BEGIN
-        declare @Mensagem varchar(20)
-        set @Mensagem = 'Cliente inexistente'
+        set @Mensagem = 'Cliente inexistente ou inválido'
         RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
     END
-    else
+    ELSE
     BEGIN
-        select @id = id from kiwicut.Cliente WHERE cpf = @cpf
-
-        BEGIN TRANSACTION
-        DELETE kiwicut.Cliente WHERE id = @id
-        IF @@ERROR <> 0
-        BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            delete from kiwicut.Cliente where id = @id
+            print 'Deleção concluida'
             COMMIT TRANSACTION
-            PRINT 'O cliente foi deletado com sucesso';
-        END
-        ELSE
-        BEGIN
+        END TRY  
+        BEGIN CATCH 
             ROLLBACK TRANSACTION
-            DECLARE @msn varchar(1000)
-            set @msn =  cast(@@ERROR as VARCHAR)
-            set @Mensagem = 'Erro interno'
-            RAISERROR ('Erro ao deletar cliente: %s', 16, 2, @msn)
-        END
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+        END CATCH 
     END
 END
 
