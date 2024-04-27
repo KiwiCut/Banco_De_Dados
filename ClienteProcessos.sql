@@ -47,7 +47,7 @@ BEGIN
 END
 
 
--- atualizar: nome, sobrenome, cep, telefone,senha 
+-- atualizar: cep, telefone,senha 
 CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
     @nome varchar(15), @cpf char(11)
 AS
@@ -63,6 +63,33 @@ BEGIN
             update kiwicut.Cliente set nome = @nome where cpf = @cpf
         END    
 END
+
+CREATE or alter PROCEDURE kiwicut.atualizarSobrenomeCliente 
+    @sobrenome varchar(25), @cpf char(11)
+AS
+BEGIN
+    if not EXISTS (select id from kiwicut.Cliente where cpf = @cpf)
+        Begin
+            DECLARE @Mensagem varchar(30)
+            set @Mensagem = 'CPF inexistente e/ou inválido'
+            RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
+        END
+    ELSE
+    BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            update kiwicut.Cliente set sobrenome = @sobrenome where cpf = @cpf
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END    
+END
+
+
 
 create or ALTER VIEW kiwicut.ingressosPorNomes as 
 select
