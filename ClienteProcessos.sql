@@ -1,11 +1,11 @@
 create or ALTER PROCEDURE kiwicut.incluirCliente
-    @nome varchar(11), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha nvarchar(MAX),
+    @nome varchar(15), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha nvarchar(MAX),
     @cpf char(11), @cep char(9), @dataNascimento date 
 as
 BEGIN
     if not exists (select cpf from kiwicut.Cliente where cpf = @cpf)
         begin
-            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone, @senha, @cpf, @cep, @dataNascimento)
+            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone, @cpf, @cep, @dataNascimento, @senha)
             if @@ERROR <>0
             BEGIN
                 declare @Mensagem NVARCHAR(100)
@@ -47,7 +47,6 @@ BEGIN
 END
 
 
---senha 
 CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
     @nome varchar(15), @cpf char(11)
 AS
@@ -140,6 +139,30 @@ BEGIN
     END    
 END
 
+CREATE or alter PROCEDURE kiwicut.atualizarSenhaCliente 
+    @senha nvarchar(MAX), @cpf char(11)
+AS
+BEGIN
+    if not EXISTS (select id from kiwicut.Cliente where cpf = @cpf)
+        Begin
+            DECLARE @Mensagem varchar(30)
+            set @Mensagem = 'CPF inexistente e/ou inválido'
+            RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
+        END
+    ELSE
+    BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            update kiwicut.Cliente set senha = @senha where cpf = @cpf
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END    
+END
 
 create or ALTER VIEW kiwicut.ingressosPorNomes as 
 select
