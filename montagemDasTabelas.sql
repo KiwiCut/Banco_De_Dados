@@ -22,7 +22,7 @@ create table kiwicut.Show(
 Create table kiwicut.Ingresso(
     cpfCliente char(11) not null,
     idShow int not null,
-    idIngresso nvarchar not null,
+    idIngresso nvarchar not null PRIMARY key,
     FOREIGN key (cpfCliente) REFERENCES kiwicut.Cliente(cpf),
     FOREIGN KEY (idShow) REFERENCES kiwicut.Show(id)
 )
