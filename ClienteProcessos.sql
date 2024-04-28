@@ -1,5 +1,5 @@
 create or ALTER PROCEDURE kiwicut.incluirCliente
-    @nome varchar(11), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha varchar,
+    @nome varchar(11), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha nvarchar(MAX),
     @cpf char(11), @cep char(9), @dataNascimento date 
 as
 BEGIN
