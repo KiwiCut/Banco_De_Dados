@@ -16,7 +16,7 @@ insert into kiwicut.Show
 VALUES
     (1,'Rap in Cena','934653840','29-10-2023')
 
-
+exec kiwicut.incluirShow 4,'Lollapalooza','08090750',"01-08-2024"
 -- T A B E L A   D E   I N G R E S S O 
 insert into kiwicut.Ingresso
 VALUES
