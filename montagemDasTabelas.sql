@@ -6,7 +6,7 @@ create table kiwicut.Cliente(
     sobrenome varchar(25) not null,
     email varchar(35) not null unique,
     telefone char(11) not null unique,
-    senha varchar,
+    senha nvarchar(MAX),
     cpf char(11) not null UNIQUE,
     cep char(9) not null,
     dataNascimento date
