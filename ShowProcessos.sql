@@ -49,8 +49,6 @@ BEGIN
     END    
 END
 
-
-
 create or alter PROCEDURE kiwicut.adcionarDataNoShow
 @idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
 AS
@@ -59,7 +57,7 @@ BEGIN
     BEGIN
         DECLARE @Mensagem varchar(37)
         set @Mensagem = 'Show buscado não registrado registrado'
-        RAISERROR ('Erro ao incluir um Show: %s', 16, 2, @Mensagem)
+        RAISERROR ('Erro ao atualizar o show: %s', 16, 2, @Mensagem)
     END
     ELSE
     BEGIN
@@ -71,7 +69,7 @@ BEGIN
         BEGIN CATCH 
             ROLLBACK TRANSACTION
             Set @Mensagem = 'Erro interno'
-            RAISERROR ('Erro ao cadastrar um show :%s', 16, 2, @Mensagem)
+            RAISERROR ('Erro ao atualizar o show :%s', 16, 2, @Mensagem)
         END CATCH 
     END    
 END
