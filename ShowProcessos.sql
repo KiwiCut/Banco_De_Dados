@@ -48,3 +48,32 @@ BEGIN
         END CATCH 
     END    
 END
+
+
+
+create or alter PROCEDURE kiwicut.adcionarDataNoShow
+@idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
+AS
+BEGIN
+    if not EXISTS (select nome,idArtista,localCep from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep)
+    BEGIN
+        DECLARE @Mensagem varchar(37)
+        set @Mensagem = 'Show buscado não registrado registrado'
+        RAISERROR ('Erro ao incluir um Show: %s', 16, 2, @Mensagem)
+    END
+    ELSE
+    BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            UPDATE kiwicut.Show SET dataShow = @dataShow WHERE nome = @nome and idArtista = @idArtista and localCep = @localCep;
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao cadastrar um show :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END    
+END
+
+
