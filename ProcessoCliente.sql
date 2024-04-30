@@ -5,7 +5,9 @@ as
 BEGIN
     if not exists (select cpf from kiwicut.Cliente where cpf = @cpf)
         begin
-            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone, @cpf, @cep, @dataNascimento, @senha)
+            OPEN symmetric key MinhaChave
+            Decryption by certificate certificadoDeCriptografia
+            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone, @cpf, @cep, @dataNascimento, EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)))
             if @@ERROR <>0
             BEGIN
                 declare @Mensagem NVARCHAR(100)
@@ -18,6 +20,7 @@ BEGIN
             RAISERROR('Cliente, enviado já existe no banco de dados',16,2)
         end
 END
+
 
 CREATE or ALTER PROCEDURE kiwicut.deletarCliente
     @cpf char(11)
