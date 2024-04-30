@@ -156,16 +156,18 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set senha = @senha where cpf = @cpf
+            update kiwicut.Cliente set senha = EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)) where cpf = @cpf
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
             Set @Mensagem = 'Erro interno'
-            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+            RAISERROR ('Erro ao atualizar senha :%s', 16, 2, @Mensagem)
         END CATCH 
     END    
 END
+
+exec kiwicut.atualizarSenhaCliente 'mls51asw@', '98451326051' --ERRO
 
 create or ALTER VIEW kiwicut.ingressosPorNomes as 
 select
