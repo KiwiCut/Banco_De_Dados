@@ -75,3 +75,27 @@ BEGIN
 END
 
 
+create or alter PROCEDURE kiwicut.cancelarShow
+@idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
+as
+BEGIN
+    if not EXISTS (select id from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep and dataShow = @dataShow)
+    BEGIN
+        DECLARE @Mensagem varchar(30)
+        set @Mensagem = 'Show buscado não registrado'
+        RAISERROR ('Erro ao cancelar o show: %s', 16, 2, @Mensagem)
+    END
+    ELSE
+    BEGIN
+    begin TRANSACTION
+        BEGIN TRY  
+            delete from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep and @dataShow = dataShow
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao cancelar o show :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END
+END
