@@ -7,7 +7,7 @@ BEGIN
         begin
             OPEN symmetric key MinhaChave
             Decryption by certificate certificadoDeCriptografia
-            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone, @cpf, @cep, @dataNascimento, EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)))
+            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone,EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)) ,EncryptByKey(Key_GUID('MinhaChave'),Cast(@cpf as varchar)), @cep, @dataNascimento)
             if @@ERROR <>0
             BEGIN
                 declare @Mensagem NVARCHAR(100)

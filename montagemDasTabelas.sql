@@ -7,7 +7,7 @@ create table kiwicut.Cliente(
     email varchar(35) not null unique,
     telefone char(11) not null unique,
     senha varbinary(128) not null,
-    cpf char(11) not null UNIQUE,
+    cpf varbinary(128) not null UNIQUE,
     cep char(9) not null,
     dataNascimento date
 )
@@ -20,7 +20,7 @@ create table kiwicut.Show(
     FOREIGN KEY (idArtista) REFERENCES kiwicut.Artista(id)
 )
 Create table kiwicut.Ingresso(
-    cpfCliente char(11) not null,
+    cpfCliente varbinary(128) not null,
     idShow int not null,
     idIngresso nvarchar not null PRIMARY key,
     FOREIGN key (cpfCliente) REFERENCES kiwicut.Cliente(cpf),

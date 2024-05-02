@@ -27,3 +27,5 @@ BEGIN
     Decryption by certificate certificadoDeCriptografia
     select c.nome +' '+c.sobrenome as 'Nome', c.senha, CONVERT(varchar,DECRYPTBYKEY(c.senha)) as 'Senha sem cripto' from kiwicut.Cliente as c
 END
+
+select * from kiwicut.Cliente
