@@ -1,3 +1,4 @@
+/*
 create or ALTER PROCEDURE kiwicut.incluirCliente
     @nome varchar(15), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha nvarchar(MAX),
     @cpf char(11), @cep char(9), @dataNascimento date 
@@ -21,14 +22,15 @@ BEGIN
         end
 END
 
-
 CREATE or ALTER PROCEDURE kiwicut.deletarCliente
-    @cpf char(11)
+    @cpf char(11),@email varchar(35)
 as 
 BEGIN
-    declare @id int, @Mensagem varchar(31)
-    SELECT @id = id FROM kiwicut.Cliente WHERE cpf = @cpf
-    IF NOT EXISTS (select * from kiwicut.Cliente where id = @id)
+    declare @id int, @Mensagem varchar(31),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
+    SELECT @cpfDoBanco =cpf from kiwicut.Cliente where email = @email
+    select @id = id from kiwicut.Cliente where email = @email
+    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    IF NOT EXISTS (select * from kiwicut.Cliente where @cpf = @cpfDescrip)
     BEGIN
         set @Mensagem = 'Cliente inexistente ou inválido'
         RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -48,7 +50,7 @@ BEGIN
         END CATCH 
     END
 END
-
+*/
 
 CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
     @nome varchar(15), @cpf char(11)
