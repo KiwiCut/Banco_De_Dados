@@ -83,12 +83,15 @@ END
 */
 
 CREATE or alter PROCEDURE kiwicut.atualizarSobrenomeCliente 
-    @sobrenome varchar(25), @cpf char(11)
+    @sobrenome varchar(25), @cpf char(11),@email varchar(35)
 AS
 BEGIN
-    if not EXISTS (select id from kiwicut.Cliente where cpf = @cpf)
+    declare @id int, @Mensagem varchar(31),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
+    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
+    select @id = id from kiwicut.Cliente where email = @email
+    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
         Begin
-            DECLARE @Mensagem varchar(30)
             set @Mensagem = 'CPF inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
         END
@@ -96,18 +99,19 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set sobrenome = @sobrenome where cpf = @cpf
+            update kiwicut.Cliente set sobrenome = @sobrenome where id = @id
             COMMIT TRANSACTION
+            print 'Sobrenome atualizado com SUCESSO'
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
             Set @Mensagem = 'Erro interno'
-            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+            RAISERROR ('Erro ao atualizar sobrenome cliente :%s', 16, 2, @Mensagem)
         END CATCH 
     END    
 END
 
-
+/*
 CREATE or alter PROCEDURE kiwicut.atualizarTelefoneCliente 
     @telefone char(11), @cpf char(11)
 AS
