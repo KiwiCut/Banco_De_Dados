@@ -50,23 +50,37 @@ BEGIN
         END CATCH 
     END
 END
-*/
+
 
 CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
-    @nome varchar(15), @cpf char(11)
+    @nome varchar(15), @cpf char(11),@email varchar(35)
 AS
 BEGIN
-    if not EXISTS (select id from kiwicut.Cliente where cpf = @cpf)
+    declare @id int, @Mensagem varchar(31),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
+    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
+    select @id = id from kiwicut.Cliente where email = @email
+    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
         Begin
-            DECLARE @Mensagem varchar(30)
             set @Mensagem = 'CPF inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
         END
     ELSE
-        BEGIN
-            update kiwicut.Cliente set nome = @nome where cpf = @cpf
-        END    
+    BEGIN
+        begin TRANSACTION
+        BEGIN TRY  
+            update kiwicut.Cliente set nome = @nome where id = @id
+            print 'Alteração concluida'
+            COMMIT TRANSACTION
+        END TRY  
+        BEGIN CATCH 
+            ROLLBACK TRANSACTION
+            Set @Mensagem = 'Erro interno'
+            RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
+        END CATCH 
+    END  
 END
+*/
 
 CREATE or alter PROCEDURE kiwicut.atualizarSobrenomeCliente 
     @sobrenome varchar(25), @cpf char(11)
