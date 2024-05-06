@@ -110,7 +110,7 @@ BEGIN
         END CATCH 
     END    
 END
-*/
+
 
 CREATE or alter PROCEDURE kiwicut.atualizarTelefoneCliente 
     @telefone char(11), @cpf char(11),@email varchar(35)
@@ -139,16 +139,18 @@ BEGIN
         END CATCH 
     END    
 END
+*/
 
-
-/*
 CREATE or alter PROCEDURE kiwicut.atualizarCepCliente 
-    @cep char(9), @cpf char(11)
+    @cep char(9), @cpf char(11),@email varchar(35)
 AS
 BEGIN
-    if not EXISTS (select cpf from kiwicut.Cliente where cpf = @cpf)
+    declare @id int, @Mensagem varchar(60),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
+    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
+    select @id = id from kiwicut.Cliente where email = @email
+    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
         Begin
-            DECLARE @Mensagem varchar(47)
             set @Mensagem = 'CEP atrelado ao CPF é inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
         END
@@ -156,7 +158,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set cep = @cep where cpf = @cpf
+            update kiwicut.Cliente set cep = @cep where id = @id
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
@@ -167,6 +169,7 @@ BEGIN
     END    
 END
 
+/*
 CREATE or alter PROCEDURE kiwicut.atualizarSenhaCliente 
     @senha nvarchar(MAX), @cpf char(11)
 AS
