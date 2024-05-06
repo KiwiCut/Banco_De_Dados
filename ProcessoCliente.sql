@@ -1,4 +1,3 @@
-/*
 create or ALTER PROCEDURE kiwicut.incluirCliente
     @nome varchar(15), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha nvarchar(MAX),
     @cpf char(11), @cep char(9), @dataNascimento date 
@@ -45,7 +44,7 @@ BEGIN
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
-            Set @Mensagem = 'Erro interno'
+            set @mensagem = ERROR_MESSAGE()
             RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
         END CATCH 
     END
@@ -75,7 +74,7 @@ BEGIN
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
-            Set @Mensagem = 'Erro interno'
+            set @mensagem = ERROR_MESSAGE()
             RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
         END CATCH 
     END  
@@ -105,7 +104,7 @@ BEGIN
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
-            Set @Mensagem = 'Erro interno'
+            set @mensagem = ERROR_MESSAGE()
             RAISERROR ('Erro ao atualizar sobrenome cliente :%s', 16, 2, @Mensagem)
         END CATCH 
     END    
@@ -134,12 +133,12 @@ BEGIN
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
-            Set @Mensagem = 'Erro interno'
+            set @mensagem = ERROR_MESSAGE()
             RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
         END CATCH 
     END    
 END
-*/
+
 
 CREATE or alter PROCEDURE kiwicut.atualizarCepCliente 
     @cep char(9), @cpf char(11),@email varchar(35)
@@ -163,46 +162,39 @@ BEGIN
         END TRY  
         BEGIN CATCH 
             ROLLBACK TRANSACTION
-            Set @Mensagem = 'Erro interno'
+            set @mensagem = ERROR_MESSAGE()
             RAISERROR ('Erro ao deletar cliente :%s', 16, 2, @Mensagem)
         END CATCH 
     END    
 END
 
-/*
-CREATE or alter PROCEDURE kiwicut.atualizarSenhaCliente 
-    @senha nvarchar(MAX), @cpf char(11)
+
+CREATE OR ALTER PROCEDURE kiwicut.atualizarSenhaCliente
+    @senha varchar(128), @cpf char(11), @email varchar(35)
 AS
 BEGIN
-    if not EXISTS (select id from kiwicut.Cliente where cpf = @cpf)
-        Begin
-            DECLARE @Mensagem varchar(30)
-            set @Mensagem = 'CPF inexistente e/ou inválido'
+    declare @id int, @mensagem varchar(30),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
+    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
+    select @id = id from kiwicut.Cliente where email = @email
+    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
+      BEGIN
+            set @mensagem = 'CPF inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
-        END
-    ELSE
-    BEGIN
-        begin TRANSACTION
-        BEGIN TRY  
-            update kiwicut.Cliente set senha = EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)) where cpf = @cpf
-            COMMIT TRANSACTION
-        END TRY  
-        BEGIN CATCH 
-            ROLLBACK TRANSACTION
-            Set @Mensagem = 'Erro interno'
-            RAISERROR ('Erro ao atualizar senha :%s', 16, 2, @Mensagem)
-        END CATCH 
-    END    
+      END
+    else
+      BEGIN
+            begin TRAN
+            begin TRY
+                    OPEN symmetric key MinhaChave
+                    Decryption by certificate certificadoDeCriptografia
+                    update kiwicut.Cliente set senha = EncryptByKey(Key_GUID('MinhaChave'), @senha) where id = @id
+                    commit TRAN
+            END TRY
+            begin CATCH
+                    ROLLBACK tran
+                    set @mensagem = ERROR_MESSAGE()
+                    RAISERROR ('Erro ao atualizar senha: %s', 16, 2, @Mensagem)
+            END catch
+      END
 END
-
-exec kiwicut.atualizarSenhaCliente 'mls51asw@', '98451326051' --ERRO
-
-create or ALTER VIEW kiwicut.ingressosPorNomes as 
-select
-    'Você: '+cli.nome + ' '+ cli.sobrenome + ' '+ 'Artista: '+ art.nome +' Show: '+sh.nome + 'ID do Show: '+ sh.id 
-FROM
-    kiwicut.Cliente as cli
-    kiwicut.Ingresso as ing
-    kiwicut.Show as sh
-    kiwicut.Artista as art
-where
