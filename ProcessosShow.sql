@@ -1,3 +1,4 @@
+/*
 create or alter PROCEDURE kiwicut.incluirShowComData
 @idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
 AS
@@ -73,13 +74,13 @@ BEGIN
         END CATCH 
     END    
 END
-
+*/
 
 create or alter PROCEDURE kiwicut.cancelarShow
-@idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
+@id int
 as
 BEGIN
-    if not EXISTS (select id from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep and dataShow = @dataShow)
+    if not EXISTS (select id from kiwicut.Show where id = @id)
     BEGIN
         DECLARE @Mensagem varchar(30)
         set @Mensagem = 'Show buscado não registrado'
@@ -89,7 +90,7 @@ BEGIN
     BEGIN
     begin TRANSACTION
         BEGIN TRY  
-            delete from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep and @dataShow = dataShow
+            delete from kiwicut.Show where id = @id
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
