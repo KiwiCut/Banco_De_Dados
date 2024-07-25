@@ -198,3 +198,10 @@ BEGIN
             END catch
       END
 END
+
+create or alter PROCEDURE kiwicut.buscarShowsPertoDeMim
+    @cepDoClinte char(11)
+AS
+BEGIN
+    select nome from kiwicut.Show where localCep= @cepDoClinte and dataShow = CONVERT(date, GETDATE())
+END
