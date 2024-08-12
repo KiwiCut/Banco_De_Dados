@@ -1,9 +1,9 @@
 /*
-create or alter PROCEDURE kiwicut.incluirShowComData
+create or alter PROCEDURE showme.incluirShowComData
 @idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
 AS
 BEGIN
-    if EXISTS (select nome,idArtista,localCep from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep and dataShow = @dataShow)
+    if EXISTS (select nome,idArtista,localCep from showme.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep and dataShow = @dataShow)
     BEGIN
         DECLARE @Mensagem varchar(30)
         set @Mensagem = 'Show idêntico já registrado'
@@ -13,7 +13,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            insert into kiwicut.Show VALUES (@idArtista,@nome,@localCep,@dataShow)
+            insert into showme.Show VALUES (@idArtista,@nome,@localCep,@dataShow)
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
@@ -25,11 +25,11 @@ BEGIN
 END
 
 
-create or alter PROCEDURE kiwicut.incluirShowSemData
+create or alter PROCEDURE showme.incluirShowSemData
 @idArtista int, @nome varchar(50),@localCep char(9)
 AS
 BEGIN
-    if EXISTS (select nome,idArtista,localCep from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep)
+    if EXISTS (select nome,idArtista,localCep from showme.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep)
     BEGIN
         DECLARE @Mensagem varchar(30)
         set @Mensagem = 'Show idêntico já registrado'
@@ -39,7 +39,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            insert into kiwicut.Show VALUES (@idArtista,@nome,@localCep,null)
+            insert into showme.Show VALUES (@idArtista,@nome,@localCep,null)
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
@@ -50,11 +50,11 @@ BEGIN
     END    
 END
 
-create or alter PROCEDURE kiwicut.adcionarDataNoShow
+create or alter PROCEDURE showme.adcionarDataNoShow
 @idArtista int, @nome varchar(50),@localCep char(9), @dataShow date
 AS
 BEGIN
-    if not EXISTS (select nome,idArtista,localCep from kiwicut.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep)
+    if not EXISTS (select nome,idArtista,localCep from showme.Show where nome = @nome and idArtista = @idArtista and localCep = @localCep)
     BEGIN
         DECLARE @Mensagem varchar(37)
         set @Mensagem = 'Show buscado não registrado registrado'
@@ -64,7 +64,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            UPDATE kiwicut.Show SET dataShow = @dataShow WHERE nome = @nome and idArtista = @idArtista and localCep = @localCep;
+            UPDATE showme.Show SET dataShow = @dataShow WHERE nome = @nome and idArtista = @idArtista and localCep = @localCep;
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
@@ -76,11 +76,11 @@ BEGIN
 END
 */
 
-create or alter PROCEDURE kiwicut.cancelarShow
+create or alter PROCEDURE showme.cancelarShow
 @id int
 as
 BEGIN
-    if not EXISTS (select id from kiwicut.Show where id = @id)
+    if not EXISTS (select id from showme.Show where id = @id)
     BEGIN
         DECLARE @Mensagem varchar(30)
         set @Mensagem = 'Show buscado não registrado'
@@ -90,7 +90,7 @@ BEGIN
     BEGIN
     begin TRANSACTION
         BEGIN TRY  
-            delete from kiwicut.Show where id = @id
+            delete from showme.Show where id = @id
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 

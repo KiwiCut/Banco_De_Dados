@@ -9,14 +9,14 @@ select * from sys.symmetric_keys
 
 select * from sys.certificates
 
-select * from kiwicut.Cliente
+select * from showme.Cliente
 
 
 --P A R A   C R I P T O G R A F A R:
 BEGIN
     OPEN symmetric key MinhaChave
     Decryption by certificate certificadoDeCriptografia
-    insert into kiwicut.Cliente 
+    insert into showme.Cliente 
     VALUES
     ('Felipe','Manuel','manuelFelipe@gmail.com','21946280156','98451326051','62154302','2024-07-07', EncryptByKey(Key_GUID('MinhaChave'), 'NationalIDNumber'))
 END
@@ -25,7 +25,8 @@ END
 BEGIN
     OPEN symmetric key MinhaChave
     Decryption by certificate certificadoDeCriptografia
-    select c.nome +' '+c.sobrenome as 'Nome', c.senha, CONVERT(varchar,DECRYPTBYKEY(c.senha)) as 'Senha sem cripto' from kiwicut.Cliente as c
+    select c.nome +' '+c.sobrenome as 'Nome', c.senha, CONVERT(varchar,DECRYPTBYKEY(c.senha)) as 'Senha sem cripto' from showme.Cliente as c
 END
 
-select * from kiwicut.Cliente
+select * from showme.Cliente
+

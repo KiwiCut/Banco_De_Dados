@@ -1,13 +1,13 @@
-create or ALTER PROCEDURE kiwicut.incluirCliente
+create or ALTER PROCEDURE showme.incluirCliente
     @nome varchar(15), @sobrenome varchar(25), @email varchar(35), @telefone char(11), @senha nvarchar(MAX),
     @cpf char(11), @cep char(9), @dataNascimento date 
 as
 BEGIN
-    if not exists (select cpf from kiwicut.Cliente where cpf = @cpf)
+    if not exists (select cpf from showme.Cliente where cpf = @cpf)
         begin
             OPEN symmetric key MinhaChave
             Decryption by certificate certificadoDeCriptografia
-            insert into kiwicut.Cliente values (@nome,@sobrenome, @email,@telefone,EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)) ,EncryptByKey(Key_GUID('MinhaChave'),Cast(@cpf as varchar)), @cep, @dataNascimento)
+            insert into showme.Cliente values (@nome,@sobrenome, @email,@telefone,EncryptByKey(Key_GUID('MinhaChave'), CAST(@senha as varchar)) ,EncryptByKey(Key_GUID('MinhaChave'),Cast(@cpf as varchar)), @cep, @dataNascimento)
             if @@ERROR <>0
             BEGIN
                 declare @Mensagem NVARCHAR(100)
@@ -21,15 +21,15 @@ BEGIN
         end
 END
 
-CREATE or ALTER PROCEDURE kiwicut.deletarCliente
+CREATE or ALTER PROCEDURE showme.deletarCliente
     @cpf char(11),@email varchar(35)
 as 
 BEGIN
     declare @id int, @Mensagem varchar(31),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
-    SELECT @cpfDoBanco =cpf from kiwicut.Cliente where email = @email
-    select @id = id from kiwicut.Cliente where email = @email
-    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
-    IF NOT EXISTS (select * from kiwicut.Cliente where @cpf = @cpfDescrip)
+    SELECT @cpfDoBanco =cpf from showme.Cliente where email = @email
+    select @id = id from showme.Cliente where email = @email
+    exec showme.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    IF NOT EXISTS (select * from showme.Cliente where @cpf = @cpfDescrip)
     BEGIN
         set @Mensagem = 'Cliente inexistente ou inválido'
         RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -38,7 +38,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            delete from kiwicut.Cliente where id = @id
+            delete from showme.Cliente where id = @id
             print 'Deleção concluida'
             COMMIT TRANSACTION
         END TRY  
@@ -51,15 +51,15 @@ BEGIN
 END
 
 
-CREATE or alter PROCEDURE kiwicut.atualizarNomeCliente 
+CREATE or alter PROCEDURE showme.atualizarNomeCliente 
     @nome varchar(15), @cpf char(11),@email varchar(35)
 AS
 BEGIN
     declare @id int, @Mensagem varchar(31),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
-    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
-    select @id = id from kiwicut.Cliente where email = @email
-    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
-    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
+    select @cpfDoBanco = cpf from showme.Cliente where email = @email
+    select @id = id from showme.Cliente where email = @email
+    exec showme.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from showme.Cliente where @cpf = @cpfDescrip)
         Begin
             set @Mensagem = 'CPF inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -68,7 +68,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set nome = @nome where id = @id
+            update showme.Cliente set nome = @nome where id = @id
             print 'Alteração concluida'
             COMMIT TRANSACTION
         END TRY  
@@ -81,15 +81,15 @@ BEGIN
 END
 
 
-CREATE or alter PROCEDURE kiwicut.atualizarSobrenomeCliente 
+CREATE or alter PROCEDURE showme.atualizarSobrenomeCliente 
     @sobrenome varchar(25), @cpf char(11),@email varchar(35)
 AS
 BEGIN
     declare @id int, @Mensagem varchar(31),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
-    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
-    select @id = id from kiwicut.Cliente where email = @email
-    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
-    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
+    select @cpfDoBanco = cpf from showme.Cliente where email = @email
+    select @id = id from showme.Cliente where email = @email
+    exec showme.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from showme.Cliente where @cpf = @cpfDescrip)
         Begin
             set @Mensagem = 'CPF inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -98,7 +98,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set sobrenome = @sobrenome where id = @id
+            update showme.Cliente set sobrenome = @sobrenome where id = @id
             COMMIT TRANSACTION
             print 'Sobrenome atualizado com SUCESSO'
         END TRY  
@@ -111,15 +111,15 @@ BEGIN
 END
 
 
-CREATE or alter PROCEDURE kiwicut.atualizarTelefoneCliente 
+CREATE or alter PROCEDURE showme.atualizarTelefoneCliente 
     @telefone char(11), @cpf char(11),@email varchar(35)
 AS
 BEGIN
     declare @id int, @Mensagem varchar(60),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
-    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
-    select @id = id from kiwicut.Cliente where email = @email
-    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
-    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
+    select @cpfDoBanco = cpf from showme.Cliente where email = @email
+    select @id = id from showme.Cliente where email = @email
+    exec showme.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from showme.Cliente where @cpf = @cpfDescrip)
         Begin
             set @Mensagem = 'Número de telefone atrelado ao CPF é inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -128,7 +128,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set telefone = @telefone where id = @id
+            update showme.Cliente set telefone = @telefone where id = @id
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
@@ -140,15 +140,15 @@ BEGIN
 END
 
 
-CREATE or alter PROCEDURE kiwicut.atualizarCepCliente 
+CREATE or alter PROCEDURE showme.atualizarCepCliente 
     @cep char(9), @cpf char(11),@email varchar(35)
 AS
 BEGIN
     declare @id int, @Mensagem varchar(60),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
-    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
-    select @id = id from kiwicut.Cliente where email = @email
-    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
-    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
+    select @cpfDoBanco = cpf from showme.Cliente where email = @email
+    select @id = id from showme.Cliente where email = @email
+    exec showme.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from showme.Cliente where @cpf = @cpfDescrip)
         Begin
             set @Mensagem = 'CEP atrelado ao CPF é inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -157,7 +157,7 @@ BEGIN
     BEGIN
         begin TRANSACTION
         BEGIN TRY  
-            update kiwicut.Cliente set cep = @cep where id = @id
+            update showme.Cliente set cep = @cep where id = @id
             COMMIT TRANSACTION
         END TRY  
         BEGIN CATCH 
@@ -169,15 +169,15 @@ BEGIN
 END
 
 
-CREATE OR ALTER PROCEDURE kiwicut.atualizarSenhaCliente
+CREATE OR ALTER PROCEDURE showme.atualizarSenhaCliente
     @senha varchar(128), @cpf char(11), @email varchar(35)
 AS
 BEGIN
     declare @id int, @mensagem varchar(30),@cpfDoBanco varbinary(max), @cpfDescrip char (11)
-    select @cpfDoBanco = cpf from kiwicut.Cliente where email = @email
-    select @id = id from kiwicut.Cliente where email = @email
-    exec kiwicut.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
-    if not EXISTS (select id from kiwicut.Cliente where @cpf = @cpfDescrip)
+    select @cpfDoBanco = cpf from showme.Cliente where email = @email
+    select @id = id from showme.Cliente where email = @email
+    exec showme.descriptografarAlgo @cpfDoBanco, @cpfDescrip OUTPUT
+    if not EXISTS (select id from showme.Cliente where @cpf = @cpfDescrip)
       BEGIN
             set @mensagem = 'CPF inexistente e/ou inválido'
             RAISERROR ('Cliente buscado não existe no banco: %s', 16, 2, @Mensagem)
@@ -188,7 +188,7 @@ BEGIN
             begin TRY
                     OPEN symmetric key MinhaChave
                     Decryption by certificate certificadoDeCriptografia
-                    update kiwicut.Cliente set senha = EncryptByKey(Key_GUID('MinhaChave'), @senha) where id = @id
+                    update showme.Cliente set senha = EncryptByKey(Key_GUID('MinhaChave'), @senha) where id = @id
                     commit TRAN
             END TRY
             begin CATCH
@@ -199,9 +199,9 @@ BEGIN
       END
 END
 
-create or alter PROCEDURE kiwicut.buscarShowsPertoDeMim
+create or alter PROCEDURE showme.buscarShowsPertoDeMim
     @cepDoClinte char(11)
 AS
 BEGIN
-    select nome from kiwicut.Show where localCep= @cepDoClinte and dataShow = CONVERT(date, GETDATE())
+    select nome from showme.Show where localCep= @cepDoClinte and dataShow = CONVERT(date, GETDATE())
 END
